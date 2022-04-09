@@ -4,24 +4,37 @@ import "./Home.css";
 import Product from "./Product.js";
 import MetaData from "../layout/MetaData";
 import { getProduct } from "../../actions/productActions";
-import {useSelector,useDispatch} from "react-redux"
+import {useSelector,useDispatch} from "react-redux";
+import Loader from "../layout/Loader/Loader";
+import {useAlert} from "react-alert"
 
 
 const Home = () => {
+
+  const alert =useAlert()
   const dispatch = useDispatch();
-  const { loading, error, products, productCount} = useSelector(
+  const { loading, error, products, productsCount} = useSelector(
     (state) => state.products
   )
 
   useEffect(() => {
+        
+    if(error){
+      return alert.error(error);
+    }
+
     dispatch(getProduct());
-  }, [dispatch]);
+  }, [dispatch,error,alert]);
 
   return (
-   <Fragment>
-     <MetaData title="MyCart" />
+    <Fragment>
+      {loading ? (
+        <Loader />
+      ) : (
+        <Fragment>
+          <MetaData title="ECOMMERCE" />
 
-      <div className="banner">
+          <div className="banner">
             <p>Welcome to MyCart</p>
             <h1>FIND AMAZING PRODUCTS BELOW</h1>
 
@@ -33,13 +46,16 @@ const Home = () => {
           </div>
 
           <h2 className="homeHeading">Featured Products</h2>
- 
+
           <div className="container" id="container">
-            {products && products.map((product)=> <Product product={product} />)}
-
+            {products &&
+              products.map((product) => 
+                <Product product={product} />
+              )}
           </div>
-
-  </Fragment>
+        </Fragment>
+      )}
+    </Fragment>
   );
 };
 
